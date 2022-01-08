@@ -20,7 +20,7 @@ const nextRequest = async (has_more, next_page) => {
     }
 }
 
-const getAllCards = cron.schedule('* * * * *', async () => {
+const getAllCards = cron.schedule('1 0 * * *', async () => {
     actualRequest = 0;
     console.log("Job has started...")
     const response = await axios.get('https://api.scryfall.com/cards/search?order=released&unique=prints&q=t:legend+include:extras')
