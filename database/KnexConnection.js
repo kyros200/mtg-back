@@ -3,11 +3,11 @@ const knex = require('knex')
 const K = knex({
     client: 'mysql2',
     connection: {
-        host: "localhost",
+        host: "kutnpvrhom7lki7u.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
         port: 3306,
-        user: "root",
-        password: "senha200",
-        database: "najjarmtg"
+        user: "l1jdfx975047recf",
+        password: "luwhnb2rfujgpwc8",
+        database: "tr7y4dwbvoy4hfzs"
     }
 })
 
