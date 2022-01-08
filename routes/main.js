@@ -4,7 +4,7 @@ const mainService = require("../services/mainService");
 let route = express.Router();
 
 route.get('/search', async (req, res) => {
-  mainService.search(req.query.name)
+  mainService.search(req.query.name, req.query.setName)
   .then((data) => {
     res.status(200).json({success: true, ...data});
   })

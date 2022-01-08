@@ -1,7 +1,7 @@
 const K = require("../database/KnexConnection");
 
-search = async (name) => {
-  const res = await K('card').whereRaw(`LOWER(name) LIKE '%${name || ""}%'`)
+search = async (name, setName) => {
+  const res = await K('card').whereRaw(`LOWER(name) LIKE '%${name || ""}%' AND LOWER(setName) LIKE '%${setName || ""}%'`)
 
   let searchSets = [...res].reduce((a, v) => (
     {...a, [v.setId]: {
