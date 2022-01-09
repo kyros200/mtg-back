@@ -21,7 +21,7 @@ const nextRequest = async (has_more, next_page) => {
     }
 }
 
-const getAllCards = cron.schedule('1 0 * * *', async () => {
+const getAllCards = cron.schedule('* * * * *', async () => {
     actualRequest = 0;
     console.log("Job has started...")
     setsInfo = (await axios.get('https://api.scryfall.com/sets')).data.data;
@@ -59,7 +59,13 @@ const formatCards = (list) => {
 }
 
 const upsertCards = async (list) => {
-    await K('card').insert(formatCards(list)).onConflict('id').merge();
+    const forbiddenSets= [
+        '638940fb-6be9-4be3-b83f-68d3902fbbe5',// Magic Online Promos
+        'b432b6ae-1d7d-49b1-ab1c-93ae7195fa06' // Magic Online Theme Decks
+    ]
+
+    let formattedList = list.filter((card) => !forbiddenSets.includes(card.set_id))
+    await K('card').insert(formatCards(formattedList)).onConflict('id').merge();
 }
 
 const start = () => {
