@@ -21,7 +21,7 @@ const nextRequest = async (has_more, next_page) => {
     }
 }
 
-const getAllCards = cron.schedule('* * * * *', async () => {
+const getAllCards = cron.schedule('1 0 * * *', async () => {
     actualRequest = 0;
     console.log("Job has started...")
     setsInfo = (await axios.get('https://api.scryfall.com/sets')).data.data;
