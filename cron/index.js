@@ -4,6 +4,7 @@ const K = require("../database/KnexConnection");
 
 let totalRequests = 0;
 let actualRequest = 0;
+let setsInfo = [];
 
 const nextRequest = async (has_more, next_page) => {
     if(has_more) {
@@ -23,6 +24,8 @@ const nextRequest = async (has_more, next_page) => {
 const getAllCards = cron.schedule('1 0 * * *', async () => {
     actualRequest = 0;
     console.log("Job has started...")
+    setsInfo = (await axios.get('https://api.scryfall.com/sets')).data.data;
+    console.log("Got all sets!")
     const response = await axios.get('https://api.scryfall.com/cards/search?order=released&unique=prints&q=t:legend+include:extras')
 
     totalRequests = Math.ceil(response.data.total_cards / 175);
@@ -42,9 +45,9 @@ const formatCards = (list) => {
             id: card.id,
             name: card.name,
             setId: card.set_id,
-            setAbr: card.set,
+            setReleaseDate: setsInfo.filter((set) => set.id === card.set_id)[0].released_at,
             setName: card.set_name,
-            setUri: card.set_uri,
+            setIcon: setsInfo.filter((set) => set.id === card.set_id)[0].icon_svg_uri,
             imageUrl: card.image_uris?.normal,
             priceUsd: card.prices?.usd,
             priceEur: card.prices?.eur,
@@ -56,13 +59,8 @@ const formatCards = (list) => {
 }
 
 const upsertCards = async (list) => {
-    const queryInsert = K('card').insert(formatCards(list));
-  
-    const queryFinal = `${queryInsert.toString()} on duplicate key update ${"`id`=Values(`id`)"}`;
-  
-    const res = await K.raw(queryFinal);
+    await K('card').insert(formatCards(list)).onConflict('id').merge();
 }
-
 
 const start = () => {
     getAllCards.start();

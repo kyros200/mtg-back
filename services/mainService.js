@@ -1,13 +1,15 @@
 const K = require("../database/KnexConnection");
 
 search = async (name, setName) => {
-  const res = await K('card').whereRaw(`LOWER(name) LIKE '%${name || ""}%' AND LOWER(setName) LIKE '%${setName || ""}%'`)
+  const res = await K('card')
+  .whereRaw(`LOWER(name) LIKE '%${name || ""}%' AND LOWER(setName) LIKE '%${setName || ""}%'`)
+  .orderBy('setReleaseDate', "desc")
 
   let searchSets = [...res].reduce((a, v) => (
     {...a, [v.setId]: {
       setName: v.setName, 
-      setAbr: v.setAbr, 
-      setUri: v.setUri, 
+      setReleaseDate: v.setReleaseDate, 
+      setIcon: v.setIcon, 
       cards: []
     }
   }), {})
@@ -20,7 +22,6 @@ search = async (name, setName) => {
 }
 
 setHave = async (id, have) => {
-  console.log(`id = ${id}, have = ${have}`);
   await K('card').where({id: id}).update({have: have});
 }
 
