@@ -21,8 +21,13 @@ search = async (name, setName) => {
   return {data: searchSets, count: res.length, countSets: Object.keys(searchSets).length};
 }
 
+getAll = async () => {
+  const res = await K('card').select()
+  return {data: res, totalCards: res.length}
+}
+
 setHave = async (id, have) => {
   await K('card').where({id: id}).update({have: have});
 }
 
-module.exports = { search, setHave };
+module.exports = { search, setHave, getAll };

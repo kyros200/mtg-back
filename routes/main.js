@@ -14,6 +14,17 @@ route.get('/search', async (req, res) => {
   })
 });
 
+route.get('/getall', async (req, res) => {
+  mainService.getAll()
+  .then((data) => {
+    res.status(200).json({success: true, ...data});
+  })
+  .catch((e) => {
+    console.log(e)
+    res.status(500).json({success: false, message: "something went wrong"})
+  })
+});
+
 route.get('/collection', async (req, res) => {
   if (!req.query.id) {
     res.status(400).json({success: false, message: "Id is missing! Need to deliver card id."})
