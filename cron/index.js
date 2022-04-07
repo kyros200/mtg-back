@@ -44,24 +44,31 @@ const getAllCards = cron.schedule('0 * * * *', async () => {
 
 const formatCards = (list) => {
     return list.map((card) => {
+        let formattedImg = card.image_uris ? card.image_uris?.normal : card.card_faces[0].image_uris.normal
+        formattedImg = formattedImg?.replace("https://c1.scryfall.com/file/scryfall-cards/normal", "")
+        let formattedTcg = card.purchase_uris?.tcgplayer
+        formattedTcg = formattedTcg?.replace("https://www.tcgplayer.com/product/", "")?.replace("?page=1&utm_campaign=affiliate&utm_medium=api&utm_source=scryfall", "")
+        if (formattedTcg?.includes("https"))
+            formattedTcg = null;
         return {
             id: card.id,
             name: card.name,
             setId: card.set_id,
-            imageUrl: card.image_uris ? card.image_uris?.normal : card.card_faces[0].image_uris.normal,
-            priceUsd: card.prices?.usd,
-            urlTcg: card.purchase_uris?.tcgplayer,
+            imageUrl: formattedImg,
+            priceUsd: parseFloat(card.prices?.usd || 0),
+            urlTcg: formattedTcg,
         }
     })
 }
 
 const formatSets = (list) => {
     return list.map((set) => {
+        let formattedIcon = set.icon_svg_uri?.replace("https://c2.scryfall.com/file/scryfall-symbols/sets/", "")?.replace(".svg?1649044800", "")
         return {
             setId: set.id,
             setReleaseDate: set.released_at,
             setName: set.name,
-            setIcon: set.icon_svg_uri,
+            setIcon: formattedIcon,
         }
     })
 }
