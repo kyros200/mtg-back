@@ -23,7 +23,7 @@ const nextRequest = async (has_more, next_page) => {
     }
 }
 
-const getAllCards = cron.schedule('* * * * *', async () => {
+const getAllCards = cron.schedule('0 * * * *', async () => {
     actualRequest = 0;
     console.log("Job has started...")
     setsInfo = (await axios.get('https://api.scryfall.com/sets')).data.data;
@@ -48,7 +48,7 @@ const formatCards = (list) => {
             id: card.id,
             name: card.name,
             setId: card.set_id,
-            imageUrl: card.image_uris?.normal,
+            imageUrl: card.image_uris ? card.image_uris?.normal : card.card_faces[0].image_uris.normal,
             priceUsd: card.prices?.usd,
             urlTcg: card.purchase_uris?.tcgplayer,
         }
