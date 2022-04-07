@@ -8,8 +8,10 @@ let setsInfo = [];
 
 const nextRequest = async (has_more, next_page) => {
     if(has_more) {
+        console.log("getting next batch")
         const response = await axios.get(next_page);
 
+        console.log("starting next upsert")
         await upsertCards(response.data.data);
 
         actualRequest = actualRequest + 1;
@@ -21,10 +23,11 @@ const nextRequest = async (has_more, next_page) => {
     }
 }
 
-const getAllCards = cron.schedule('1 0 * * *', async () => {
+const getAllCards = cron.schedule('* * * * *', async () => {
     actualRequest = 0;
     console.log("Job has started...")
     setsInfo = (await axios.get('https://api.scryfall.com/sets')).data.data;
+    await upsertSets(setsInfo)
     console.log("Got all sets!")
     const response = await axios.get('https://api.scryfall.com/cards/search?order=released&unique=prints&q=t:legend+include:extras')
 
@@ -45,15 +48,20 @@ const formatCards = (list) => {
             id: card.id,
             name: card.name,
             setId: card.set_id,
-            setReleaseDate: setsInfo.filter((set) => set.id === card.set_id)[0].released_at,
-            setName: card.set_name,
-            setIcon: setsInfo.filter((set) => set.id === card.set_id)[0].icon_svg_uri,
             imageUrl: card.image_uris?.normal,
             priceUsd: card.prices?.usd,
-            priceEur: card.prices?.eur,
             urlTcg: card.purchase_uris?.tcgplayer,
-            urlCm: card.purchase_uris?.cardmarket,
-            urlCh: card.purchase_uris?.cardhoarder,
+        }
+    })
+}
+
+const formatSets = (list) => {
+    return list.map((set) => {
+        return {
+            setId: set.id,
+            setReleaseDate: set.released_at,
+            setName: set.name,
+            setIcon: set.icon_svg_uri,
         }
     })
 }
@@ -65,7 +73,19 @@ const upsertCards = async (list) => {
     ]
 
     let formattedList = list.filter((card) => !forbiddenSets.includes(card.set_id))
-    await K('card').insert(formatCards(formattedList)).onConflict('id').merge();
+    try {
+        await K('card').insert(formatCards(formattedList)).onConflict('id').merge();
+    } catch (e) {
+        console.log("ERROR ON UPSERT CARDS = ", e)
+    }
+}
+
+const upsertSets = async (list) => {
+    try {
+        await K('card_set').insert(formatSets(list)).onConflict('setId').merge();
+    } catch (e) {
+        console.log("ERROR ON UPSERT SETS = ", e)
+    }
 }
 
 const start = () => {

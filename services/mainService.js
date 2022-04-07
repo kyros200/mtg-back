@@ -2,6 +2,7 @@ const K = require("../database/KnexConnection");
 
 search = async (name, setName) => {
   const res = await K('card')
+  .join('card_set', 'card.setId', 'card_set.setId')
   .whereRaw(`LOWER(name) LIKE '%${name || ""}%' AND LOWER(setName) LIKE '%${setName || ""}%'`)
   .orderBy('setReleaseDate', "desc")
 
