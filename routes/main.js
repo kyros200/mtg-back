@@ -15,7 +15,7 @@ route.get('/search', async (req, res) => {
 });
 
 route.post('/collection', async (req, res) => {
-  mainService.setFlags(req.body.data, req.body.have, req.body.ban)
+  mainService.setFlags(req.body)
   .then(() => {
     res.status(200).json({success: true, message: `success! Changed ${req.body.data.length} cards`});
   })

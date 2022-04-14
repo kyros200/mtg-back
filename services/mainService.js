@@ -23,12 +23,13 @@ search = async (name, setName, searchBanned = false) => {
   return {data: searchSets, count: res.length, countSets: Object.keys(searchSets).length};
 }
 
-setFlags = async (data, have, ban) => {
+setFlags = async ({data, have, ban, priceAlex}) => {
   await K('card')
   .whereIn('id', data)
   .update({
     have: have,
-    ban: ban
+    ban: ban,
+    priceAlex: priceAlex,
   });
 }
 
