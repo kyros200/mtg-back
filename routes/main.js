@@ -4,7 +4,7 @@ const mainService = require("../services/mainService");
 let route = express.Router();
 
 route.get('/search', async (req, res) => {
-  mainService.search(req.query.name, req.query.setName)
+  mainService.search(req.query.name, req.query.setName, req.query.searchBanned)
   .then((data) => {
     res.status(200).json({success: true, ...data});
   })
@@ -14,18 +14,10 @@ route.get('/search', async (req, res) => {
   })
 });
 
-route.get('/collection', async (req, res) => {
-  if (!req.query.id) {
-    res.status(400).json({success: false, message: "Id is missing! Need to deliver card id."})
-  }
-
-  if (!req.query.have) {
-    res.status(400).json({success: false, message: "Boolean is missing! Need to deliver 1 or 0."})
-  }
-
-  mainService.setHave(req.query.id, req.query.have)
+route.post('/collection', async (req, res) => {
+  mainService.setFlags(req.body.data, req.body.have, req.body.ban)
   .then(() => {
-    res.status(200).json({success: true, message: `success! Set ${req.query.id} card with value ${req.query.have}`});
+    res.status(200).json({success: true, message: `success! Changed ${req.body.data.length} cards`});
   })
   .catch((e) => {
     console.log(e)

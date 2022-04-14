@@ -1,9 +1,10 @@
 const K = require("../database/KnexConnection");
 
-search = async (name, setName) => {
+search = async (name, setName, searchBanned = false) => {
+  console.log(searchBanned)
   const res = await K('card')
   .join('card_set', 'card.setId', 'card_set.setId')
-  .whereRaw(`LOWER(name) LIKE '%${name || ""}%' AND LOWER(setName) LIKE '%${setName || ""}%'`)
+  .whereRaw(`LOWER(name) LIKE '%${name || ""}%' AND LOWER(setName) LIKE '%${setName || ""}%' ${searchBanned === "true" ? "" : "AND ban = 0"}`)
   .orderBy('setReleaseDate', "desc")
 
   let searchSets = [...res].reduce((a, v) => (
@@ -22,8 +23,13 @@ search = async (name, setName) => {
   return {data: searchSets, count: res.length, countSets: Object.keys(searchSets).length};
 }
 
-setHave = async (id, have) => {
-  await K('card').where({id: id}).update({have: have});
+setFlags = async (data, have, ban) => {
+  await K('card')
+  .whereIn('id', data)
+  .update({
+    have: have,
+    ban: ban
+  });
 }
 
-module.exports = { search, setHave };
+module.exports = { search, setFlags };
