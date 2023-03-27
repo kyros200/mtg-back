@@ -9,7 +9,9 @@ let setsInfo = [];
 const nextRequest = async (has_more, next_page) => {
     if(has_more) {
         console.log("getting next batch")
-        const response = await axios.get(next_page);
+        const response = await axios.get(next_page, {headers: {
+            Host: "rpi.najjar.dev"
+          }});
 
         console.log("starting next upsert")
         await upsertCards(response.data.data);
@@ -26,10 +28,14 @@ const nextRequest = async (has_more, next_page) => {
 const getAllCards = cron.schedule('0 0 * * *', async () => {
     actualRequest = 0;
     console.log("Job has started...")
-    setsInfo = (await axios.get('https://api.scryfall.com/sets')).data.data;
+    setsInfo = (await axios.get('https://api.scryfall.com/sets', {headers: {
+        Host: "rpi.najjar.dev"
+      }})).data.data;
     await upsertSets(setsInfo)
     console.log("Got all sets!")
-    const response = await axios.get('https://api.scryfall.com/cards/search?order=released&unique=prints&q=t:legend+include:extras')
+    const response = await axios.get('https://api.scryfall.com/cards/search?order=released&unique=prints&q=t:legend+include:extras', {headers: {
+        Host: "rpi.najjar.dev"
+      }})
 
     totalRequests = Math.ceil(response.data.total_cards / 175);
 
@@ -97,6 +103,9 @@ const upsertSets = async (list) => {
 
 const start = () => {
     getAllCards.start();
+    cron.schedule('* * * * *', async () => {
+        console.log("KEEPING ALIVE")
+    }).start();
 }
 
 module.exports = { start };
