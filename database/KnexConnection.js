@@ -7,8 +7,7 @@ const K = knex({
         port: 3306,
         user: "najjar-mtg",
         password: "senha200",
-        database: "najjar_mtg",
-        requestTimeout: 60000,
+        database: "najjar_mtg"
     }
 })
 
