@@ -44,7 +44,7 @@ const getAllCards = cron.schedule('0,10,20,30,40,50 * * * *', async () => {
 
 const formatCards = (list) => {
     return list.map((card) => {
-        let formattedImg = card.image_uris ? card.image_uris?.normal : card.card_faces[0].image_uris.normal
+        let formattedImg = card.image_uris ? card.image_uris.normal : card.card_faces[0].image_uris.normal
         formattedImg = formattedImg?.replace("https://c1.scryfall.com/file/scryfall-cards/normal", "")
         let formattedTcg = card.purchase_uris?.tcgplayer
         formattedTcg = formattedTcg?.replace("https://www.tcgplayer.com/product/", "")?.replace("?page=1&utm_campaign=affiliate&utm_medium=api&utm_source=scryfall", "")
