@@ -94,9 +94,9 @@ const upsertSets = async (list) => {
 
 const start = () => {
     getAllCards.start();
-    cron.schedule('* * * * *', async () => {
-        console.log("KEEPING ALIVE")
-    }).start();
+    // cron.schedule('* * * * *', async () => {
+    //     console.log("KEEPING ALIVE")
+    // }).start();
 }
 
 module.exports = { start };
