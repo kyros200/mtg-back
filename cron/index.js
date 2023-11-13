@@ -8,10 +8,8 @@ let setsInfo = [];
 
 const nextRequest = async (has_more, next_page) => {
     if(has_more) {
-        console.log("getting next batch")
         const response = await axios.get(next_page);
 
-        console.log("starting next upsert")
         await upsertCards(response.data.data);
 
         actualRequest = actualRequest + 1;
@@ -32,6 +30,7 @@ const getAllCards = cron.schedule('0 0 * * *', async () => {
     const response = await axios.get('https://api.scryfall.com/cards/search?order=released&unique=prints&q=t:legend+include:extras')
 
     totalRequests = Math.ceil(response.data.total_cards / 175);
+    console.log(`${response.data.total_cards} cards found, it will need ${totalRequests} requests!`)
 
     actualRequest = actualRequest + 1;
     console.log(`${actualRequest} de ${totalRequests} done!`)
